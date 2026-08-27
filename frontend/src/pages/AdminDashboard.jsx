@@ -57,7 +57,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-card-foreground">管理後台</h1>
-              <p className="text-xs text-muted-foreground">榮譽牆</p>
+              <p className="text-xs text-muted-foreground">資源中心</p>
             </div>
           </div>
           <div className="flex items-center gap-4">

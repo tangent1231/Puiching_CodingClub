@@ -32,7 +32,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-card-foreground">管理員登入</h1>
-          <p className="mt-1 text-sm text-muted-foreground">榮譽牆後台</p>
+          <p className="mt-1 text-sm text-muted-foreground">資源中心後台</p>
         </div>
 
         {error && (

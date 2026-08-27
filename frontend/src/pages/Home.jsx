@@ -3,6 +3,7 @@ import Hero from '../components/Hero'
 import Events from '../components/Events'
 import AwardSearch from '../components/AwardSearch'
 import Photos from '../components/Photos'
+import Resources from '../components/Resources'
 import Footer from '../components/Footer'
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <Events />
       <AwardSearch />
       <Photos />
+      <Resources />
       <Footer />
     </main>
   )

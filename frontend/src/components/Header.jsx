@@ -8,6 +8,7 @@ export default function Header() {
     { href: '#events-section', label: '活動公告' },
     { href: '#awards-search', label: '獲獎查詢' },
     { href: '#photos-section', label: '活動相簿' },
+    { href: '#resources-section', label: '學習資源' },
   ]
 
   return (
@@ -22,7 +23,7 @@ export default function Header() {
           />
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-primary">Coding Club</p>
-            <p className="text-xs text-muted-foreground">榮譽牆</p>
+            <p className="text-xs text-muted-foreground">資源中心</p>
           </div>
         </a>
 
