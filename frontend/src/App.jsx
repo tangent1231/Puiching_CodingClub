@@ -9,6 +9,7 @@ import StudentRegister from './pages/StudentRegister'
 import StudentProfile from './pages/StudentProfile'
 import Competitions from './pages/Competitions'
 import CompetitionDetail from './pages/CompetitionDetail'
+import AuthCallback from './pages/AuthCallback'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/profile" element={<StudentProfile />} />
       <Route path="/competitions" element={<Competitions />} />
       <Route path="/competitions/:id" element={<CompetitionDetail />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/competitions" element={<AdminCompetitions />} />
