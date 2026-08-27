@@ -1,32 +1,43 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+import { supabase } from '../lib/supabase'
 
-async function fetchJson(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+const FUNCTION_NAMES = {
+  events: 'events',
+  awards: 'awards',
+  photos: 'photos',
+  certificate: 'certificate',
+}
+
+async function invokeFunction(name, { method = 'GET', body, query } = {}) {
+  const path = query ? `${name}?${new URLSearchParams(query).toString()}` : name
+  const { data, error } = await supabase.functions.invoke(path, {
+    method,
+    body: body ? JSON.stringify(body) : undefined,
   })
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Request failed' }))
-    throw new Error(error.detail || `HTTP ${response.status}`)
+  if (error) {
+    throw new Error(error.message || `Function ${name} failed`)
   }
-  if (response.status === 204) return null
-  return response.json()
+  return data
 }
 
 export const api = {
-  getEvents: () => fetchJson('/api/events'),
-  getAwards: (name = '') => fetchJson(`/api/awards?name=${encodeURIComponent(name)}`),
-  getCertificateUrl: (recordId) => `${API_BASE}/api/awards/${recordId}/certificate`,
-  getPhotos: (year) => fetchJson(`/api/photos${year ? `?year=${year}` : ''}`),
-  getPhotoYears: () => fetchJson('/api/photos/years'),
-  login: (username, password) => fetchJson('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ username, password }),
-  }),
-  getMe: (token) => fetchJson('/api/auth/me', {
-    headers: { Authorization: `Bearer ${token}` },
-  }),
+  getEvents: () => invokeFunction(FUNCTION_NAMES.events),
+  getAwards: (name = '') =>
+    invokeFunction(FUNCTION_NAMES.awards, {
+      query: name ? { q: name } : undefined,
+    }),
+  getCertificateUrl: (recordId, fileToken) => {
+    const params = new URLSearchParams()
+    if (recordId) params.set('recordId', recordId)
+    if (fileToken) params.set('fileToken', fileToken)
+    return `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/certificate?${params.toString()}`
+  },
+  getPhotos: (year) =>
+    invokeFunction(FUNCTION_NAMES.photos, {
+      query: year !== undefined ? { year: String(year) } : undefined,
+    }),
+  getPhotoYears: async () => {
+    const photos = await invokeFunction(FUNCTION_NAMES.photos)
+    const years = [...new Set(photos.map((p) => p.year))]
+    return years.sort((a, b) => b - a)
+  },
 }

@@ -1,31 +1,41 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { LogOut, Shield } from 'lucide-react'
-import { api } from '../api/client'
+import { supabase, signOutAdmin } from '../lib/supabase'
 
 export default function AdminDashboard() {
   const navigate = useNavigate()
-  const [admin, setAdmin] = useState(null)
+  const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('pcc_admin_token')
-    if (!token) {
-      navigate('/admin/login')
-      return
-    }
-    api
-      .getMe(token)
-      .then(setAdmin)
-      .catch(() => {
-        localStorage.removeItem('pcc_admin_token')
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error || !data.session) {
         navigate('/admin/login')
-      })
-      .finally(() => setLoading(false))
+        return
+      }
+      setUser(data.session.user)
+      setLoading(false)
+    }
+
+    checkSession()
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate('/admin/login')
+      } else {
+        setUser(session.user)
+      }
+    })
+
+    return () => {
+      listener?.subscription?.unsubscribe()
+    }
   }, [navigate])
 
-  const handleLogout = () => {
-    localStorage.removeItem('pcc_admin_token')
+  const handleLogout = async () => {
+    await signOutAdmin()
     navigate('/admin/login')
   }
 
@@ -51,7 +61,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden text-sm text-muted-foreground sm:inline">{admin?.username}</span>
+            <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
             <button
               type="button"
               onClick={handleLogout}

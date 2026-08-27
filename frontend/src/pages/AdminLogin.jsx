@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Lock, User, AlertCircle } from 'lucide-react'
-import { api } from '../api/client'
+import { Lock, Mail, AlertCircle } from 'lucide-react'
+import { signInAdmin } from '../lib/supabase'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -15,8 +15,10 @@ export default function AdminLogin() {
     setError('')
     setLoading(true)
     try {
-      const data = await api.login(username, password)
-      localStorage.setItem('pcc_admin_token', data.access_token)
+      const { data, error: signInError } = await signInAdmin(email, password)
+      if (signInError || !data.session) {
+        throw new Error(signInError?.message || '登入失敗')
+      }
       navigate('/admin/dashboard')
     } catch (err) {
       setError(err.message)
@@ -42,16 +44,16 @@ export default function AdminLogin() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-card-foreground">帳號</label>
+            <label className="mb-1 block text-sm font-medium text-card-foreground">電郵</label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="h-10 w-full rounded-lg border border-input bg-background pl-9 pr-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
-                placeholder="admin"
+                placeholder="admin@example.com"
               />
             </div>
           </div>
