@@ -3,6 +3,7 @@ import {
   downloadAttachment,
   firstText,
   formatDate,
+  getAttachments,
   getFirstAttachment,
   isFeishuConfigured,
   parseIntOrDefault,
@@ -17,13 +18,14 @@ interface PhotoOut {
   title: string;
   photo_date: string;
   image_url: string;
+  image_urls: string[];
   order: number;
 }
 
 const MOCK_PHOTOS: PhotoOut[] = [
-  { record_id: "p1", year: 2024, title: "編程工作坊", photo_date: "2024-03-15", image_url: "/activity-1.jpg", order: 1 },
-  { record_id: "p2", year: 2024, title: "校際比賽", photo_date: "2024-05-20", image_url: "/activity-2.jpg", order: 2 },
-  { record_id: "p3", year: 2023, title: "暑期集訓營", photo_date: "2023-08-10", image_url: "/activity-3.jpg", order: 1 },
+  { record_id: "p1", year: 2024, title: "編程工作坊", photo_date: "2024-03-15", image_url: "/activity-1.jpg", image_urls: ["/activity-1.jpg"], order: 1 },
+  { record_id: "p2", year: 2024, title: "校際比賽", photo_date: "2024-05-20", image_url: "/activity-2.jpg", image_urls: ["/activity-2.jpg"], order: 2 },
+  { record_id: "p3", year: 2023, title: "暑期集訓營", photo_date: "2023-08-10", image_url: "/activity-3.jpg", image_urls: ["/activity-3.jpg"], order: 1 },
 ];
 
 function getProxyImageUrl(reqUrl: URL, recordId: string, fileToken: string): string {
@@ -33,19 +35,18 @@ function getProxyImageUrl(reqUrl: URL, recordId: string, fileToken: string): str
 
 function parsePhoto(record: { record_id: string; fields: Record<string, unknown> }, reqUrl: URL): PhotoOut {
   const fields = record.fields;
-  const attachment = getFirstAttachment(fields, "照片附件");
-  let imageUrl = "";
-  if (attachment?.file_token) {
-    imageUrl = getProxyImageUrl(reqUrl, record.record_id, attachment.file_token);
-  } else if (attachment?.url) {
-    imageUrl = attachment.url;
-  }
+  const attachments = getAttachments(fields, "照片附件");
+  const imageUrls = attachments
+    .filter((a) => a.file_token)
+    .map((a) => getProxyImageUrl(reqUrl, record.record_id, a.file_token as string));
+  const fallbackUrl = attachments[0]?.url ?? "";
   return {
     record_id: record.record_id,
     year: parseIntOrDefault(fields["年份"], 2024),
     title: firstText(fields["标题"]) || firstText(fields["標題"]),
     photo_date: formatDate(fields["照片时间"]) || formatDate(fields["照片時間"]),
-    image_url: imageUrl,
+    image_url: imageUrls[0] || fallbackUrl,
+    image_urls: imageUrls.length > 0 ? imageUrls : (fallbackUrl ? [fallbackUrl] : []),
     order: parseIntOrDefault(fields["显示顺序"], parseIntOrDefault(fields["顯示順序"], 0)),
   };
 }

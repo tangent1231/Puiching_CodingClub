@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Calendar, CalendarClock, Megaphone } from 'lucide-react'
+import { Calendar, CalendarClock, ExternalLink, Megaphone } from 'lucide-react'
 import { api } from '../api/client'
 
 const statusConfig = {
@@ -7,6 +7,8 @@ const statusConfig = {
   报名进行中: { color: 'text-[#c41e2a]', icon: CalendarClock },
   即將舉行: { color: 'text-[#c8a145]', icon: Calendar },
   即将举行: { color: 'text-[#c8a145]', icon: Calendar },
+  已結束: { color: 'text-muted-foreground', icon: Calendar },
+  已结束: { color: 'text-muted-foreground', icon: Calendar },
 }
 
 export default function Events() {
@@ -53,6 +55,17 @@ export default function Events() {
                   </p>
                   <h3 className="mt-2 text-lg font-semibold text-card-foreground">{event.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{event.description || event.date}</p>
+                  {event.link_url && (
+                    <a
+                      href={event.link_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      查看詳情
+                    </a>
+                  )}
                 </div>
                 <Icon className="h-5 w-5 text-muted-foreground" />
               </div>

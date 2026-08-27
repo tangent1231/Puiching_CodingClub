@@ -1,6 +1,81 @@
 import { useEffect, useState } from 'react'
-import { Image } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Image } from 'lucide-react'
 import { api } from '../api/client'
+
+function PhotoCard({ photo }) {
+  const images = photo.image_urls && photo.image_urls.length > 0 ? photo.image_urls : [photo.image_url]
+  const [index, setIndex] = useState(0)
+  const total = images.length
+
+  const prev = (e) => {
+    e.stopPropagation()
+    setIndex((i) => (i - 1 + total) % total)
+  }
+  const next = (e) => {
+    e.stopPropagation()
+    setIndex((i) => (i + 1) % total)
+  }
+
+  return (
+    <figure className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+        {images.map((url, i) => (
+          <img
+            key={`${photo.record_id}-${i}`}
+            src={url}
+            alt={`${photo.title} ${i + 1}`}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+              i === index ? 'opacity-100' : 'opacity-0'
+            }`}
+            loading="lazy"
+          />
+        ))}
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/60 group-hover:opacity-100"
+              aria-label="上一張"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/60 group-hover:opacity-100"
+              aria-label="下一張"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">
+              {images.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIndex(i)
+                  }}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/60'
+                  }`}
+                  aria-label={`跳到第 ${i + 1} 張`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <figcaption className="p-3">
+        <p className="text-sm font-medium text-card-foreground">{photo.title}</p>
+        {photo.photo_date && (
+          <p className="mt-1 text-xs text-muted-foreground">{photo.photo_date}</p>
+        )}
+      </figcaption>
+    </figure>
+  )
+}
 
 export default function Photos() {
   const [photos, setPhotos] = useState([])
@@ -49,25 +124,7 @@ export default function Photos() {
             </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {group.items.map((photo) => (
-                <figure
-                  key={photo.record_id}
-                  className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm"
-                >
-                  <div className="aspect-[4/3] overflow-hidden bg-muted">
-                    <img
-                      src={photo.image_url}
-                      alt={photo.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                  <figcaption className="p-3">
-                    <p className="text-sm font-medium text-card-foreground">{photo.title}</p>
-                    {photo.photo_date && (
-                      <p className="mt-1 text-xs text-muted-foreground">{photo.photo_date}</p>
-                    )}
-                  </figcaption>
-                </figure>
+                <PhotoCard key={photo.record_id} photo={photo} />
               ))}
             </div>
           </div>

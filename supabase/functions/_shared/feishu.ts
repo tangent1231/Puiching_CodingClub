@@ -200,6 +200,22 @@ export function getFirstAttachment(
   return null;
 }
 
+export function getAttachments(
+  fields: Record<string, unknown>,
+  fieldName: string,
+): AttachmentMeta[] {
+  const value = fields[fieldName];
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value as AttachmentMeta[];
+  }
+  if (typeof value === "object" && value !== null) {
+    return [value as AttachmentMeta];
+  }
+  return [];
+}
+
 export function firstText(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
