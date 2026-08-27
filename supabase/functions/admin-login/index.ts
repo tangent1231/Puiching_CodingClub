@@ -44,6 +44,18 @@ Deno.serve(async (req) => {
     return errorResponse(error?.message || "Invalid credentials", 401);
   }
 
+  // 確保管理員角色存在
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (serviceRoleKey) {
+    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    await adminClient.from("user_roles").upsert(
+      { user_id: data.user.id, role: "admin" },
+      { onConflict: "user_id" },
+    );
+  }
+
   return jsonResponse({
     access_token: data.session.access_token,
     refresh_token: data.session.refresh_token,
@@ -52,6 +64,7 @@ Deno.serve(async (req) => {
     user: {
       id: data.user.id,
       email: data.user.email,
+      role: "admin",
     },
   });
 });

@@ -1,14 +1,18 @@
-import { Menu, X } from 'lucide-react'
+import { LogIn, Menu, User, X } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router'
+import { useAuth } from '../context/AuthContext'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
+  const { user } = useAuth()
 
   const links = [
     { href: '#events-section', label: '活動公告' },
     { href: '#awards-search', label: '獲獎查詢' },
     { href: '#photos-section', label: '活動相簿' },
     { href: '#resources-section', label: '學習資源' },
+    { to: '/competitions', label: '比賽報名', isRoute: true },
   ]
 
   return (
@@ -26,16 +30,43 @@ export default function Header() {
           </div>
         </a>
 
-        <nav className="hidden gap-6 text-sm font-medium text-muted-foreground md:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="transition-colors hover:text-primary"
+        <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
+          {links.map((link) =>
+            link.isRoute ? (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="transition-colors hover:text-primary"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="transition-colors hover:text-primary"
+              >
+                {link.label}
+              </a>
+            )
+          )}
+          {user ? (
+            <Link
+              to="/profile"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
             >
-              {link.label}
-            </a>
-          ))}
+              <User className="h-4 w-4" />
+              個人中心
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-[#254aa3]"
+            >
+              <LogIn className="h-4 w-4" />
+              登入
+            </Link>
+          )}
         </nav>
 
         <button
