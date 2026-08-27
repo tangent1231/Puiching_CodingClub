@@ -5,6 +5,7 @@ const FUNCTION_NAMES = {
   awards: 'awards',
   photos: 'photos',
   certificate: 'certificate',
+  awardReview: 'award-review',
 }
 
 async function invokeFunction(name, { method = 'GET', body, query } = {}) {
@@ -40,4 +41,10 @@ export const api = {
     const years = [...new Set(photos.map((p) => p.year))]
     return years.sort((a, b) => b - a)
   },
+  getAllAwardsForReview: () => invokeFunction(FUNCTION_NAMES.awardReview),
+  updateAwardVisibility: (recordId, visible) =>
+    invokeFunction(FUNCTION_NAMES.awardReview, {
+      method: 'PUT',
+      body: { record_id: recordId, visible },
+    }),
 }

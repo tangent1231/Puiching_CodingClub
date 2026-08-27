@@ -256,6 +256,50 @@ export function formatDate(value: unknown): string {
   return "";
 }
 
+export function getCheckbox(value: unknown): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true" || value === "1";
+  }
+  if (typeof value === "number") {
+    return value === 1;
+  }
+  if (Array.isArray(value) && value.length > 0) {
+    return getCheckbox(value[0]);
+  }
+  return false;
+}
+
+export async function updateBaseRecord(
+  tableId: string,
+  recordId: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  const baseToken = getRequiredEnv("FEISHU_BASE_TOKEN");
+  const token = await fetchTenantAccessToken();
+
+  const url =
+    `${BASE_URL}/open-apis/bitable/v1/apps/${baseToken}/tables/${tableId}/records/${recordId}`;
+
+  const resp = await fetch(url, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify({ fields }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "Unknown error");
+    throw new Error(`Feishu update failed: HTTP ${resp.status} ${text}`);
+  }
+
+  const data = await resp.json();
+  if (data.code !== 0) {
+    throw new Error(`Feishu update error: ${data.msg} (code ${data.code})`);
+  }
+}
+
 export function parseIntOrDefault(value: unknown, defaultValue: number): number {
   if (typeof value === "number") {
     return Number.isFinite(value) ? value : defaultValue;

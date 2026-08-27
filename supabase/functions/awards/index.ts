@@ -2,6 +2,7 @@ import { CORS_HEADERS, errorResponse, jsonResponse } from "../_shared/cors.ts";
 import {
   firstText,
   formatDate,
+  getCheckbox,
   getFirstAttachment,
   isFeishuConfigured,
   searchBaseRecords,
@@ -41,6 +42,7 @@ function parseAward(record: { record_id: string; fields: Record<string, unknown>
     award: firstText(fields["奖项"]) || firstText(fields["獎項"]),
     date: formatDate(fields["获奖日期"]) || formatDate(fields["日期"]),
     has_certificate: Boolean(attachment),
+    visible: getCheckbox(fields["显示记录"]),
   };
 }
 
@@ -77,7 +79,8 @@ Deno.serve(async (req) => {
       : undefined;
 
     const records = await searchBaseRecords(TABLE_AWARDS, { filter });
-    return jsonResponse(records.map(parseAward));
+    const awards = records.map(parseAward).filter((a) => a.visible);
+    return jsonResponse(awards);
   } catch (err) {
     console.error("awards error:", err);
     return errorResponse(err instanceof Error ? err.message : "Internal error", 502);
