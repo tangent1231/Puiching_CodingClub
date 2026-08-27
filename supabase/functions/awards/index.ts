@@ -35,7 +35,7 @@ function parseAward(record: { record_id: string; fields: Record<string, unknown>
   const attachment = getFirstAttachment(fields, "证书附件") ?? getFirstAttachment(fields, "證書附件");
   return {
     record_id: record.record_id,
-    name: firstText(fields["姓名"]),
+    name: firstText(fields["姓名 2"]) || firstText(fields["姓名"]),
     class_name: firstText(fields["班级"]) || firstText(fields["班級"]),
     competition: firstText(fields["竞赛名称"]) || firstText(fields["競賽名稱"]),
     award: firstText(fields["奖项"]) || firstText(fields["獎項"]),
@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
           conjunction: "and" as const,
           conditions: [
             {
-              field_name: "姓名",
+              field_name: "姓名 2",
               operator: "contains",
               value: [q],
             },

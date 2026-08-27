@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download, Inbox, Search, User } from 'lucide-react'
+import { Download, ExternalLink, Inbox, Search, User } from 'lucide-react'
 import { api } from '../api/client'
 
 export default function AwardSearch() {
@@ -41,6 +41,15 @@ export default function AwardSearch() {
             <h2 className="text-2xl font-bold text-foreground">獲獎記錄查詢</h2>
             <p className="text-sm text-muted-foreground">輸入學生姓名即可篩選查閱證書</p>
           </div>
+          <a
+            href="https://scnywyt0zqyu.feishu.cn/share/base/form/shrcnkhOuwZbNbJlM0dK19SeGEj"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <ExternalLink className="h-4 w-4" />
+            提交獲獎記錄
+          </a>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-4 shadow-sm sm:p-6">
