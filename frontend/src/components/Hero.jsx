@@ -16,7 +16,7 @@ export default function Hero() {
           <span>榮譽與成就</span>
         </div>
         <h1 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-          競賽部榮譽牆
+          榮譽牆
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base text-white/80 sm:text-lg">
           記錄培正編程學子的競賽足跡，見證每一次突破與榮耀。

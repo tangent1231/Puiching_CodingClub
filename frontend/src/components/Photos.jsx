@@ -31,7 +31,7 @@ export default function Photos() {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-foreground">活動相簿</h2>
-          <p className="text-sm text-muted-foreground">按年份回顧競賽部精彩活動</p>
+          <p className="text-sm text-muted-foreground">按年份回顧精彩活動</p>
         </div>
       </div>
 
@@ -61,8 +61,11 @@ export default function Photos() {
                       loading="lazy"
                     />
                   </div>
-                  <figcaption className="p-3 text-sm font-medium text-card-foreground">
-                    {photo.title}
+                  <figcaption className="p-3">
+                    <p className="text-sm font-medium text-card-foreground">{photo.title}</p>
+                    {photo.photo_date && (
+                      <p className="mt-1 text-xs text-muted-foreground">{photo.photo_date}</p>
+                    )}
                   </figcaption>
                 </figure>
               ))}

@@ -2,6 +2,7 @@ import { CORS_HEADERS, errorResponse, jsonResponse } from "../_shared/cors.ts";
 import {
   downloadAttachment,
   firstText,
+  formatDate,
   getFirstAttachment,
   isFeishuConfigured,
   parseIntOrDefault,
@@ -14,14 +15,15 @@ interface PhotoOut {
   record_id: string;
   year: number;
   title: string;
+  photo_date: string;
   image_url: string;
   order: number;
 }
 
 const MOCK_PHOTOS: PhotoOut[] = [
-  { record_id: "p1", year: 2024, title: "編程工作坊 · 2024.03", image_url: "/activity-1.jpg", order: 1 },
-  { record_id: "p2", year: 2024, title: "校際比賽 · 2024.05", image_url: "/activity-2.jpg", order: 2 },
-  { record_id: "p3", year: 2023, title: "暑期集訓營 · 2023.08", image_url: "/activity-3.jpg", order: 1 },
+  { record_id: "p1", year: 2024, title: "編程工作坊", photo_date: "2024-03-15", image_url: "/activity-1.jpg", order: 1 },
+  { record_id: "p2", year: 2024, title: "校際比賽", photo_date: "2024-05-20", image_url: "/activity-2.jpg", order: 2 },
+  { record_id: "p3", year: 2023, title: "暑期集訓營", photo_date: "2023-08-10", image_url: "/activity-3.jpg", order: 1 },
 ];
 
 function getProxyImageUrl(reqUrl: URL, recordId: string, fileToken: string): string {
@@ -42,6 +44,7 @@ function parsePhoto(record: { record_id: string; fields: Record<string, unknown>
     record_id: record.record_id,
     year: parseIntOrDefault(fields["年份"], 2024),
     title: firstText(fields["标题"]) || firstText(fields["標題"]),
+    photo_date: formatDate(fields["照片时间"]) || formatDate(fields["照片時間"]),
     image_url: imageUrl,
     order: parseIntOrDefault(fields["显示顺序"], parseIntOrDefault(fields["顯示順序"], 0)),
   };

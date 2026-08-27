@@ -22,7 +22,7 @@ export default function Header() {
           />
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-primary">Coding Club</p>
-            <p className="text-xs text-muted-foreground">競賽部榮譽牆</p>
+            <p className="text-xs text-muted-foreground">榮譽牆</p>
           </div>
         </a>
 
