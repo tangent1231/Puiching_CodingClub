@@ -1,6 +1,7 @@
 import { CORS_HEADERS, errorResponse, jsonResponse } from "../_shared/cors.ts";
 import {
   firstText,
+  formatDate,
   isFeishuConfigured,
   searchBaseRecords,
 } from "../_shared/feishu.ts";
@@ -24,9 +25,9 @@ function parseEvent(record: { record_id: string; fields: Record<string, unknown>
   const fields = record.fields;
   return {
     record_id: record.record_id,
-    title: firstText(fields["活動名稱"]) || firstText(fields["標題"]),
-    status: firstText(fields["狀態"]) || "即將舉行",
-    date: firstText(fields["日期"]),
+    title: firstText(fields["标题"]) || firstText(fields["標題"]) || firstText(fields["活動名稱"]),
+    status: firstText(fields["状态"]) || firstText(fields["狀態"]) || "即將舉行",
+    date: formatDate(fields["活动日期"]) || formatDate(fields["日期"]),
     description: firstText(fields["描述"]),
   };
 }

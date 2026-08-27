@@ -37,7 +37,8 @@ Deno.serve(async (req) => {
       if (!record) {
         return errorResponse("Record not found", 404);
       }
-      const attachment = getFirstAttachment(record.fields, "證書附件");
+      const attachment = getFirstAttachment(record.fields, "证书附件") ??
+        getFirstAttachment(record.fields, "證書附件");
       if (!attachment) {
         return errorResponse("Certificate attachment not found", 404);
       }

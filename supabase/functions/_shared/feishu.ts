@@ -205,12 +205,39 @@ export function firstText(value: unknown): string {
     return "";
   }
   if (Array.isArray(value)) {
-    return value.length > 0 ? String(value[0]) : "";
+    return value.length > 0 ? firstText(value[0]) : "";
   }
   if (typeof value === "object" && value !== null) {
-    return String((value as Record<string, unknown>).text ?? "");
+    const text = (value as Record<string, unknown>).text;
+    if (text !== undefined && text !== null) {
+      return firstText(text);
+    }
+    return "";
   }
   return String(value);
+}
+
+export function formatDate(value: unknown): string {
+  if (value === null || value === undefined || value === "") {
+    return "";
+  }
+  // Feishu date fields are returned as millisecond timestamps
+  if (typeof value === "number") {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  if (typeof value === "string") {
+    // Already a string date
+    return value;
+  }
+  if (Array.isArray(value) && value.length > 0) {
+    return formatDate(value[0]);
+  }
+  return "";
 }
 
 export function parseIntOrDefault(value: unknown, defaultValue: number): number {

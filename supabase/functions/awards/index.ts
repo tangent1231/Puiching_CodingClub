@@ -1,6 +1,7 @@
 import { CORS_HEADERS, errorResponse, jsonResponse } from "../_shared/cors.ts";
 import {
   firstText,
+  formatDate,
   getFirstAttachment,
   isFeishuConfigured,
   searchBaseRecords,
@@ -31,14 +32,14 @@ const MOCK_AWARDS: AwardOut[] = [
 
 function parseAward(record: { record_id: string; fields: Record<string, unknown> }): AwardOut {
   const fields = record.fields;
-  const attachment = getFirstAttachment(fields, "證書附件");
+  const attachment = getFirstAttachment(fields, "证书附件") ?? getFirstAttachment(fields, "證書附件");
   return {
     record_id: record.record_id,
     name: firstText(fields["姓名"]),
-    class_name: firstText(fields["班級"]),
-    competition: firstText(fields["競賽名稱"]),
-    award: firstText(fields["獎項"]),
-    date: firstText(fields["日期"]),
+    class_name: firstText(fields["班级"]) || firstText(fields["班級"]),
+    competition: firstText(fields["竞赛名称"]) || firstText(fields["競賽名稱"]),
+    award: firstText(fields["奖项"]) || firstText(fields["獎項"]),
+    date: formatDate(fields["获奖日期"]) || formatDate(fields["日期"]),
     has_certificate: Boolean(attachment),
   };
 }
