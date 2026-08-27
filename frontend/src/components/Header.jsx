@@ -18,8 +18,7 @@ export default function Header() {
           <img
             src="/logo.png"
             alt="澳門培正中學 Coding Club"
-            className="w-auto rounded"
-            style={{ height: 50 }}
+            className="h-10 w-auto rounded sm:h-12"
           />
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-primary">Coding Club</p>
@@ -41,7 +40,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-muted md:hidden"
           onClick={() => setOpen(!open)}
           aria-label="切換選單"
         >
