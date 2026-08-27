@@ -15,7 +15,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="#" className="flex items-center gap-3">
           <img
-            src="/logo.jpg"
+            src="/logo.png"
             alt="澳門培正中學 Coding Club"
             className="w-auto rounded"
             style={{ height: 50 }}
