@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { ArrowLeft, Calendar, Send } from 'lucide-react'
+import { ArrowLeft, Calendar, Lock, Send } from 'lucide-react'
 import { Link } from 'react-router'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -83,6 +83,17 @@ export default function CompetitionDetail() {
     setSubmitting(false)
   }
 
+  const registrationStatus = () => {
+    if (!competition) return null
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const open = competition.registration_open_date ? new Date(competition.registration_open_date) : null
+    const close = competition.registration_close_date ? new Date(competition.registration_close_date) : null
+    if (open && today < open) return { open: false, reason: '報名尚未開始' }
+    if (close && today > close) return { open: false, reason: '報名已截止' }
+    return { open: true }
+  }
+
   if (loading) {
     return <div className="p-8 text-center text-sm text-muted-foreground">載入中...</div>
   }
@@ -92,6 +103,8 @@ export default function CompetitionDetail() {
   }
 
   const requiredFields = competition.required_fields || []
+  const regStatus = registrationStatus()
+  const canSubmit = regStatus.open || !!registration
 
   return (
     <div className="min-h-screen bg-muted px-4 py-10">
@@ -107,6 +120,9 @@ export default function CompetitionDetail() {
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1">
               <Calendar className="h-3.5 w-3.5" />
+              報名開始：{competition.registration_open_date || '待定'}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1">
               報名截止：{competition.registration_close_date || '待定'}
             </span>
             <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1">
@@ -116,16 +132,31 @@ export default function CompetitionDetail() {
         </div>
 
         <div className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-card-foreground">填寫報名資料</h2>
-          <p className="text-sm text-muted-foreground">帶 * 為必填項目</p>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-card-foreground">填寫報名資料</h2>
+              <p className="text-sm text-muted-foreground">帶 * 為必填項目</p>
+            </div>
+            {!regStatus.open && !registration && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">
+                <Lock className="h-3.5 w-3.5" />
+                {regStatus.reason}
+              </span>
+            )}
+            {registration && (
+              <span className="rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                已報名
+              </span>
+            )}
+          </div>
 
           {message && (
-            <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${message.startsWith('提交失敗') ? 'bg-destructive/10 text-destructive' : 'bg-green-100 text-green-700'}`}>
+            <p className={`mb-4 rounded-lg px-3 py-2 text-sm ${message.startsWith('提交失敗') ? 'bg-destructive/10 text-destructive' : 'bg-green-100 text-green-700'}`}>
               {message}
             </p>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {requiredFields.map((field) => (
               <div key={field}>
                 <label className="mb-1 block text-sm font-medium text-card-foreground">
@@ -134,9 +165,10 @@ export default function CompetitionDetail() {
                 <input
                   name={field}
                   required
+                  disabled={!canSubmit}
                   value={formData[field] || ''}
                   onChange={handleChange}
-                  className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-70"
                 />
               </div>
             ))}
@@ -145,7 +177,7 @@ export default function CompetitionDetail() {
             )}
             <button
               type="submit"
-              disabled={submitting || requiredFields.length === 0}
+              disabled={submitting || requiredFields.length === 0 || !canSubmit}
               className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-[#254aa3] disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
