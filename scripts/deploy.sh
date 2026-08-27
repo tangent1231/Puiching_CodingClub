@@ -5,14 +5,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_REF="mwxjqfiseswpijxjtdsw"
 
 cd "$ROOT_DIR"
 
 echo "==> Linking Supabase project..."
-supabase link --project-ref mwxjqfiseswpijxjtdsw
-
-echo "==> Setting secrets..."
-supabase secrets set --env-file supabase/.env.local
+supabase link --project-ref "$PROJECT_REF"
 
 echo "==> Deploying Edge Functions..."
 supabase functions deploy
