@@ -141,6 +141,14 @@ Vercel 會自動處理快取，若發現內容未更新，可嘗試：
 - 在瀏覽器按 `Ctrl + Shift + R`（Windows）或 `Cmd + Shift + R`（macOS）強制重新整理。
 - 在 Vercel Dashboard 手動觸發 Redeploy。
 
+## 獲獎記錄審核流程
+
+1. 訪客透過前台「提交獲獎記錄」連結進入飛書表單，填寫資料後提交。
+2. 提交的記錄會進入 `awards` 表格，並且 **預設不顯示**（`显示记录` 未勾選）。
+3. 管理員登入後台 `https://frontend-eight-ecru-54.vercel.app/admin/login`，在「獲獎記錄審核」區塊查看待審核記錄。
+4. 點擊「顯示」按鈕，系統會將飛書表格中的 `显示记录` 勾選，該記錄立即出現在前台。
+5. 已顯示的記錄仍可隨時點擊「隱藏」下架。
+
 ## 飛書多維表格欄位
 
 ### awards（獲獎記錄）
@@ -153,6 +161,7 @@ Vercel 會自動處理快取，若發現內容未更新，可嘗試：
 - `獎項`：文本
 - `獲獎日期`：日期
 - `證書附件`：附件（可下載）
+- `显示记录`：複選框（管理員審核用，勾選後才會在前台顯示）
 
 ### events（活動公告）
 
@@ -200,6 +209,8 @@ Vercel 會自動處理快取，若發現內容未更新，可嘗試：
 | `/functions/v1/photos/image` | GET | 代理飛書照片附件 |
 | `/functions/v1/certificate?recordId=xxx` | GET | 下載證書附件 |
 | `/functions/v1/admin-login` | POST | Supabase Auth 登入包裝端點 |
+| `/functions/v1/award-review` | GET | 管理員取得所有獲獎記錄（含待審核） |
+| `/functions/v1/award-review` | PUT | 管理員更新獲獎記錄顯示狀態 |
 
 ## GitHub
 
