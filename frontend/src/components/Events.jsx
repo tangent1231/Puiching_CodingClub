@@ -4,7 +4,9 @@ import { api } from '../api/client'
 
 const statusConfig = {
   報名進行中: { color: 'text-[#c41e2a]', icon: CalendarClock },
+  报名进行中: { color: 'text-[#c41e2a]', icon: CalendarClock },
   即將舉行: { color: 'text-[#c8a145]', icon: Calendar },
+  即将举行: { color: 'text-[#c8a145]', icon: Calendar },
 }
 
 export default function Events() {
