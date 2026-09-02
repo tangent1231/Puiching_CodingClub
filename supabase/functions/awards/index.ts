@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
           conjunction: "and" as const,
           conditions: [
             {
-              field_name: "姓名 2",
+              field_name: "姓名",
               operator: "contains",
               value: [q],
             },
