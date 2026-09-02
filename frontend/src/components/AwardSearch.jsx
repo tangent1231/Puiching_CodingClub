@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download, ExternalLink, Inbox, Search, User } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download, ExternalLink, Inbox, Search, User } from 'lucide-react'
 import { api } from '../api/client'
 
 export default function AwardSearch() {
@@ -7,10 +7,13 @@ export default function AwardSearch() {
   const [awards, setAwards] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 12
 
   const fetchAwards = async (name = '') => {
     setLoading(true)
     setError('')
+    setCurrentPage(1)
     try {
       const data = await api.getAwards(name)
       setAwards(data)
@@ -29,6 +32,10 @@ export default function AwardSearch() {
     const timer = setTimeout(() => fetchAwards(query), 300)
     return () => clearTimeout(timer)
   }, [query])
+
+  const totalPages = Math.ceil(awards.length / pageSize)
+  const paginatedAwards = awards.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+  const goToPage = (page) => setCurrentPage(Math.max(1, Math.min(page, totalPages)))
 
   return (
     <>
@@ -97,7 +104,7 @@ export default function AwardSearch() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border text-card-foreground">
-                {awards.map((item) => (
+                {paginatedAwards.map((item) => (
                   <tr key={item.record_id} className="transition-colors hover:bg-muted/50">
                     <td className="px-4 py-3 font-medium text-foreground">{item.name}</td>
                     <td className="px-4 py-3 text-muted-foreground">{item.class_name}</td>
@@ -130,7 +137,7 @@ export default function AwardSearch() {
 
           {/* Mobile cards */}
           <div className="divide-y divide-border sm:hidden">
-            {awards.map((item) => (
+            {paginatedAwards.map((item) => (
               <div key={item.record_id} className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -161,7 +168,52 @@ export default function AwardSearch() {
             ))}
           </div>
 
-          {loading && (
+                    {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6">
+              <p className="hidden text-sm text-muted-foreground sm:block">
+                第 <span className="font-medium">{currentPage}</span> / {totalPages} 頁，共 {awards.length} 筆
+              </p>
+              <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  上一頁
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => goToPage(page)}
+                      className={`inline-flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                        page === currentPage
+                          ? 'bg-primary text-primary-foreground'
+                          : 'border border-border bg-background text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  下一頁
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+{loading && (
             <div className="py-8 text-center text-sm text-muted-foreground">載入中...</div>
           )}
           {!loading && error && (
